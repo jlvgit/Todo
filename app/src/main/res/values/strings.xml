@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">CodepathTodo</string>
+    <string name="app_name">Todo</string>
+    <string name="saveButton">Save</string>
 </resources>
