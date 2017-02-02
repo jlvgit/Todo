@@ -12,19 +12,28 @@ public class EditItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
-        String itemText = getIntent().getStringExtra("itemText");
-        int itemPos = getIntent().getIntExtra("itemPos", 0);
+        String itemText = getTextToUpdate ();
         EditText myTextBox = (EditText) findViewById(R.id.editText);
         myTextBox.setText(itemText);
     }
 
+    private String getTextToUpdate(){
+        return getIntent().getStringExtra("itemText");
+    }
+
+    private int getPositionOfText(){
+        return getIntent().getIntExtra("itemPos", 0);
+    }
+
     public void submitEdit(View v) {
+        int itemPos = getPositionOfText();
+
         EditText etItem = (EditText) findViewById(R.id.editText);
         Intent data = new Intent();
 
         // Pass relevant data back as a result
         data.putExtra("editedText", etItem.getText().toString());
-        // data.putExtra("code", 200);
+        data.putExtra("itemPos", itemPos);
 
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response

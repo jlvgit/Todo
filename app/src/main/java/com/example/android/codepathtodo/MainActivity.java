@@ -30,13 +30,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        readItems();
         lvItems = (ListView) findViewById(R.id.lvItems);
         items = new ArrayList<>();
+        readItems();
+
         itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
-        items.add("First Item");
-        items.add("Second Item");
+
         setupListViewListener();
         setupEditViewListener();
     }
@@ -102,9 +102,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String etText = data.getExtras().getString("editedText");
-            int code = data.getExtras().getInt("code", 0);
-            items.add(etText);
-            Toast.makeText(this, etText, Toast.LENGTH_SHORT).show();
+            int pos = data.getExtras().getInt("itemPos", 0);
+            items.set(pos, etText);
+            writeItems();
+            Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
         }
     }
 }
