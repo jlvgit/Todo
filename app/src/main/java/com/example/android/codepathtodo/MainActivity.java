@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             int pos = data.getExtras().getInt("itemPos", 0);
             items.set(pos, etText);
             writeItems();
+            itemsAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
         }
     }
