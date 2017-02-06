@@ -3,6 +3,9 @@ package com.example.android.codepathtodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -19,12 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.R.attr.name;
+import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
+    private final int REQUEST_CODE = 20;
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
-    private final int REQUEST_CODE = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupListViewListener();
         setupEditViewListener();
-    }
-
-    public void onAddItem(View v) {
-        EditText etNewItem = (EditText) findViewById(R.id.EtNewItem);
-        String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
-        etNewItem.setText("");
-        writeItems();
     }
 
     private void setupListViewListener() {
@@ -65,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    private void setupEditViewListener () {
+    private void setupEditViewListener() {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,10 +99,38 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String etText = data.getExtras().getString("editedText");
             int pos = data.getExtras().getInt("itemPos", 0);
-            items.set(pos, etText);
-            writeItems();
+
+            if (pos > items.size()) {
+                itemsAdapter.add(etText);
+                writeItems();
+            } else {
+                items.set(pos, etText);
+                writeItems();
+            }
+
             itemsAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.add_button) {
+            Intent editItemIntent = new Intent(MainActivity.this, EditItemActivity.class);
+            editItemIntent.putExtra("itemPos", items.size() + 1);
+            startActivityForResult(editItemIntent, REQUEST_CODE);
+            Toast.makeText(this, "Go to edit page", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

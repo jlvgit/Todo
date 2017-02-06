@@ -3,6 +3,7 @@ package com.example.android.codepathtodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -13,6 +14,7 @@ public class EditItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
         String itemText = getTextToUpdate ();
+        Log.v("edit_activity", "Pos: " + getPositionOfText());
         EditText myTextBox = (EditText) findViewById(R.id.editText);
         myTextBox.setText(itemText);
     }
@@ -34,6 +36,7 @@ public class EditItemActivity extends AppCompatActivity {
         // Pass relevant data back as a result
         data.putExtra("editedText", etItem.getText().toString());
         data.putExtra("itemPos", itemPos);
+        Log.v("edit_activity", "Pos: " + itemPos);
 
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response
