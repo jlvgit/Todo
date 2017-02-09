@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.R.attr.name;
 import static android.R.id.list;
@@ -28,12 +29,14 @@ public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CODE = 20;
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
+    DatabaseHandler db = new DatabaseHandler(this);
     ListView lvItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         lvItems = (ListView) findViewById(R.id.lvItems);
         items = new ArrayList<>();
         readItems();
@@ -48,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
-
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapter,
                                                    View item, int pos, long id) {
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private void readItems() {
         File filesDir = getFilesDir();
         File todoFile = new File(filesDir, "todo.txt");
+        List<TodoItem> itemsList = db.getAllItems();
         try {
             items = new ArrayList<>(FileUtils.readLines(todoFile));
         } catch (IOException e) {
