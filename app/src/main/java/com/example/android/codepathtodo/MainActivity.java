@@ -3,6 +3,7 @@ package com.example.android.codepathtodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,8 +28,8 @@ import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CODE = 20;
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<TodoItem> items;
+    TodoItemAdapter iAdapter;
     DatabaseHandler db = new DatabaseHandler(this);
     ListView lvItems;
 
@@ -37,12 +38,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lvItems = (ListView) findViewById(R.id.lvItems);
         items = new ArrayList<>();
-        readItems();
+        items = (ArrayList<TodoItem>) db.getAllItems();
+        iAdapter = new TodoItemAdapter(this, items);
 
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-        lvItems.setAdapter(itemsAdapter);
+        lvItems = (ListView) findViewById(R.id.lvItems);
+        lvItems.setAdapter(iAdapter);
+
 
         setupListViewListener();
         setupEditViewListener();
@@ -54,9 +56,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapter,
                                                    View item, int pos, long id) {
+                        TodoItem itemAtPos = items.get(pos);
                         items.remove(pos);
-                        itemsAdapter.notifyDataSetChanged();
-                        writeItems();
+                        db.deleteItem(itemAtPos);
+                        iAdapter.notifyDataSetChanged();
                         return true;
                     }
                 }
@@ -68,50 +71,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editItemIntent = new Intent(MainActivity.this, EditItemActivity.class);
-                String selectedFromList = (parent.getItemAtPosition(position).toString());
-                editItemIntent.putExtra("itemText", selectedFromList);
+
+//                String selectedFromList = (parent.getItemAtPosition(position).toString());
+                TodoItem item = items.get(position);
+                editItemIntent.putExtra("itemID", item.getID());
+                editItemIntent.putExtra("itemText", item.getItemText());
+                editItemIntent.putExtra("itemDate", item.getItemDate());
                 editItemIntent.putExtra("itemPos", position);
                 startActivityForResult(editItemIntent, REQUEST_CODE);
             }
         });
     }
 
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        List<TodoItem> itemsList = db.getAllItems();
-        try {
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            items = new ArrayList<>();
-        }
-    }
-
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, items);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String etText = data.getExtras().getString("editedText");
+            String etDate = data.getExtras().getString("editedDate");
+            TodoItem etItem = new TodoItem(etText, etDate);
+
             int pos = data.getExtras().getInt("itemPos", 0);
 
             if (pos > items.size()) {
-                itemsAdapter.add(etText);
-                writeItems();
+                db.addItem(etItem);
+                iAdapter.add(etItem);
             } else {
-                items.set(pos, etText);
-                writeItems();
+                items.set(pos, etItem);
             }
 
-            itemsAdapter.notifyDataSetChanged();
+            iAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
         }
     }

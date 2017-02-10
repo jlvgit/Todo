@@ -9,10 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by JLV on 2/9/2017.
- */
-
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
@@ -119,7 +115,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Updating single item
-    public int updatItem(TodoItem item) {
+    public int updateItem(TodoItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
