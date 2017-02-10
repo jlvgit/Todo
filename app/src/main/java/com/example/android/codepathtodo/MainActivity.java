@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent editItemIntent = new Intent(MainActivity.this, EditItemActivity.class);
 
-//                String selectedFromList = (parent.getItemAtPosition(position).toString());
                 TodoItem item = items.get(position);
                 editItemIntent.putExtra("itemID", item.getID());
                 editItemIntent.putExtra("itemText", item.getItemText());
@@ -88,15 +87,17 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String etText = data.getExtras().getString("editedText");
             String etDate = data.getExtras().getString("editedDate");
+            int itemID = data.getIntExtra("itemID",0);
+            int pos = data.getExtras().getInt("itemPos", 0);
             TodoItem etItem = new TodoItem(etText, etDate);
 
-            int pos = data.getExtras().getInt("itemPos", 0);
-
             if (pos > items.size()) {
-                db.addItem(etItem);
                 iAdapter.add(etItem);
+                db.addItem(etItem);
             } else {
+                TodoItem olditem = db.getItem(itemID);
                 items.set(pos, etItem);
+                db.updateItem(olditem, etText, etDate);
             }
 
             iAdapter.notifyDataSetChanged();

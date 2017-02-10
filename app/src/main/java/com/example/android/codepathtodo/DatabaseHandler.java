@@ -5,11 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseHandler extends SQLiteOpenHelper {
+class DatabaseHandler extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
@@ -26,7 +27,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_TEXT = "text";
     private static final String KEY_DATE = "date";
 
-    public DatabaseHandler(Context context) {
+    DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -50,7 +51,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Adding new item
-    public void addItem(TodoItem item) {
+    void addItem(TodoItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -63,7 +64,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Getting single item
-    public TodoItem getItem(int id) {
+    TodoItem getItem(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_ITEMS, new String[] { KEY_ID,
@@ -72,15 +73,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        TodoItem item = new TodoItem(Integer.parseInt(cursor.getString(0)),
+        return new TodoItem(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1), cursor.getString(2));
-        // return contact
-        return item;
     }
 
     // Getting All items
-    public List<TodoItem> getAllItems() {
-        List<TodoItem> itemList = new ArrayList<TodoItem>();
+    List<TodoItem> getAllItems() {
+        List<TodoItem> itemList = new ArrayList<>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_ITEMS;
 
@@ -103,24 +102,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return itemList;
     }
 
-    // Getting item count
-    public int getItemsCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_ITEMS;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-
-        // return count
-        return cursor.getCount();
-    }
-
     // Updating single item
-    public int updateItem(TodoItem item) {
+    int updateItem(TodoItem item, String text, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TEXT, item.getItemText());
-        values.put(KEY_DATE, item.getItemDate());
+        values.put(KEY_TEXT, text);
+        values.put(KEY_DATE, date);
 
         // updating row
         return db.update(TABLE_ITEMS, values, KEY_ID + " = ?",
@@ -128,7 +116,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single item
-    public void deleteItem(TodoItem item) {
+    void deleteItem(TodoItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_ITEMS, KEY_ID + " = ?",
                 new String[] { String.valueOf(item.getID()) });

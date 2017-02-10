@@ -3,6 +3,7 @@ package com.example.android.codepathtodo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import java.util.Calendar;
 import android.widget.DatePicker;
@@ -40,6 +41,9 @@ public class EditItemActivity extends AppCompatActivity {
     private String getDateToUpdate(){
         return getIntent().getStringExtra("itemDate");
     }
+    private int getItemDbId(){
+        return getIntent().getIntExtra("itemID", 0);
+    }
     private int getPositionOfText(){
         return getIntent().getIntExtra("itemPos", 0);
     }
@@ -73,6 +77,7 @@ public class EditItemActivity extends AppCompatActivity {
         data.putExtra("editedText", etItem.getText().toString());
         data.putExtra("editedDate", date);
         data.putExtra("itemPos", itemPos);
+        data.putExtra("itemID", getItemDbId());
 
         // Activity finished ok, return the data
         setResult(RESULT_OK, data); // set result code and bundle data for response
