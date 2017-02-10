@@ -41,9 +41,7 @@ public class EditItemActivity extends AppCompatActivity {
     private String getDateToUpdate(){
         return getIntent().getStringExtra("itemDate");
     }
-    private int getItemDbId(){
-        return getIntent().getIntExtra("itemID", 0);
-    }
+    private int getItemDbId(){ return getIntent().getIntExtra("itemID", 0); }
     private int getPositionOfText(){
         return getIntent().getIntExtra("itemPos", 0);
     }

@@ -51,7 +51,7 @@ class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Adding new item
-    void addItem(TodoItem item) {
+    int addItem(TodoItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -59,8 +59,9 @@ class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE, item.getItemDate());
 
         // Inserting Row
-        db.insert(TABLE_ITEMS, null, values);
+        int id = (int) db.insert(TABLE_ITEMS, null, values);
         db.close(); // Closing database connection
+        return  id;
     }
 
     // Getting single item

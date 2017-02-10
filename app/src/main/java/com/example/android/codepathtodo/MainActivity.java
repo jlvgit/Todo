@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        items = new ArrayList<>();
         items = (ArrayList<TodoItem>) db.getAllItems();
         iAdapter = new TodoItemAdapter(this, items);
 
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                                                    View item, int pos, long id) {
                         TodoItem itemAtPos = items.get(pos);
                         items.remove(pos);
+                        Log.v("ONCLICK", String.valueOf(itemAtPos.getID()));
                         db.deleteItem(itemAtPos);
                         iAdapter.notifyDataSetChanged();
                         return true;
@@ -85,23 +85,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+
             String etText = data.getExtras().getString("editedText");
             String etDate = data.getExtras().getString("editedDate");
             int itemID = data.getIntExtra("itemID",0);
             int pos = data.getExtras().getInt("itemPos", 0);
-            TodoItem etItem = new TodoItem(etText, etDate);
+
+            TodoItem etItem = new TodoItem(itemID, etText, etDate);
+            db.updateItem(etItem, etText, etDate);
 
             if (pos > items.size()) {
                 iAdapter.add(etItem);
-                db.addItem(etItem);
             } else {
-                TodoItem olditem = db.getItem(itemID);
                 items.set(pos, etItem);
-                db.updateItem(olditem, etText, etDate);
             }
 
             iAdapter.notifyDataSetChanged();
-            Toast.makeText(this, "Item updated", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -119,9 +118,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.add_button) {
             Intent editItemIntent = new Intent(MainActivity.this, EditItemActivity.class);
+
+            // Create new db item on click of add button
+            TodoItem newItem = new TodoItem("", "");
+            int newID = db.addItem(newItem);
+
+            editItemIntent.putExtra("itemID", newID);
             editItemIntent.putExtra("itemPos", items.size() + 1);
             startActivityForResult(editItemIntent, REQUEST_CODE);
-            Toast.makeText(this, "Go to edit page", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
